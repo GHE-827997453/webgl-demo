@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
-      "module": "commonjs",
-      "lib": [ "es2015", "es2017", "dom" ],
+      "module": "system",
+      "lib": [ "es2015", "es2017", "dom", "es6" ],
       "target": "es5",
       "experimentalDecorators": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      "removeComments": true
+      "removeComments": true,
+      "outFile": "index.js"
     },
     "include": [
         "src"
@@ -14,5 +15,5 @@
     "exclude": [
       "node_modules",
       "dist"
-    ]
+    ],
   }

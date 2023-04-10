@@ -1,19 +1,21 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const uglify = require('gulp-uglify');
+const concat = require('gulp-concat');
 const tsProject = ts.createProject('tsconfig.json');
 
 //编译ts代码
 gulp.task('tsc', ()=>{
-    return gulp.src('./src/*.ts')
-                .pipe(tsProject())
-                .js.pipe(gulp.dest('./dist'))
+    return tsProject.src()
+            .pipe(tsProject())
+            .js/* .pipe(concat('index.js')) */
+            .pipe(gulp.dest('server'))
 })
-//压缩js文件
+// //压缩js文件
 gulp.task('uglify', () => {
-    return gulp.src('./dist/*.js')
+    return gulp.src('./server/index.js')
                 .pipe(uglify())
-                .pipe(gulp.dest('./dist'))
+                .pipe(gulp.dest('./server'))
 })
 
 //默认任务
