@@ -7,9 +7,10 @@ class Utils {
         return this.inst;
     }
 
-    public initShader(gl: WebGLRenderingContext, vshader: string, fshader: string): void {
+    public initShader(gl: WebGLRenderingContext, vshader: string, fshader: string): WebGLProgram {
         const program = this.createProgram(gl, vshader, fshader);
         gl.useProgram(program);
+        return program;
     }
 
     private createProgram(gl: WebGLRenderingContext, vshader: string, fshader: string): WebGLProgram {

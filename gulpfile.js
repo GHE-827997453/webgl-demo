@@ -11,7 +11,7 @@ gulp.task('tsc', ()=>{
             .js/* .pipe(concat('index.js')) */
             .pipe(gulp.dest('server'))
 })
-// //压缩js文件
+//压缩js文件
 gulp.task('uglify', () => {
     return gulp.src('./server/index.js')
                 .pipe(uglify())
@@ -19,4 +19,4 @@ gulp.task('uglify', () => {
 })
 
 //默认任务
-gulp.task('default', gulp.series('tsc', 'uglify'));
+gulp.task('default', gulp.series('tsc'/* , 'uglify' */));
