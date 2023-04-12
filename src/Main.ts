@@ -2,8 +2,8 @@
 class WebGLDemo {
     public static draw(): void {
         const canvas = document.getElementById('webgl') as HTMLCanvasElement;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = 400;//window.innerWidth;
+        canvas.height = 400;//window.innerHeight;
 
         const gl: WebGLRenderingContext = canvas.getContext('webgl');
         if (!gl) {
@@ -37,14 +37,35 @@ class WebGLDemo {
             console.warn('position or point not found');
             return;
         }
-        gl.vertexAttrib3f(a_Position, 0.0, 0.5, 0.5);
-        gl.vertexAttrib1f(a_Point, 50.0);
 
-        //设置清除颜色
-        gl.clearColor(1.0, 1.0, 1.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        //点信息数组
+        const pArrs = [];
 
-        gl.drawArrays(gl.POINTS, 0, 1);
+        canvas.onclick = evt => {
+            const rect = canvas.getBoundingClientRect();
+            //canvas 坐标系下坐标
+            const canvasX = (canvas.width / rect.width) * (evt.clientX - rect.left);
+            const canvasY = (canvas.height / rect.height) * (evt.clientY - rect.top);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            //webgl坐标系下坐标
+            const glX = (canvasX - centerX) / centerX;
+            const glY = -(canvasY - centerY) / centerY;
+            //随机点的大小
+            const size = Math.random() * 40;
+            const point = {x: glX, y: glY, z: 0.0, size};
+            pArrs.push(point);
+            
+            //设置清除颜色
+            gl.clearColor(1.0, 1.0, 1.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            pArrs.forEach(p => {
+                gl.vertexAttrib3f(a_Position, p.x, p.y, p.z);
+                gl.vertexAttrib1f(a_Point, p.size);
+                gl.drawArrays(gl.POINTS, 0, 1);
+            });
+        }
     }
 }
 WebGLDemo.draw();
