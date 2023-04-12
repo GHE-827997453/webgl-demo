@@ -24,17 +24,20 @@ class WebGLDemo {
             }
         `;
         //片元着色器
+        const colorKey = 'u_FragColor';
         const fshader = `
+            precision mediump float;
+            uniform vec4 ${colorKey};
             void main() {
-                gl_FragColor = vec4(0.0, 1.0, 1.0, 0.5);
+                gl_FragColor = ${colorKey};
             }
         `;
         const program = Utils.i.initShader(gl, vshader, fshader);
         const a_Position = gl.getAttribLocation(program, posKey);
         const a_Point = gl.getAttribLocation(program, pointKey);
+        const u_FragColor = gl.getUniformLocation(program, colorKey);
 
-        if (a_Position < 0 || a_Point < 0) {
-            console.warn('position or point not found');
+        if (a_Position < 0 || a_Point < 0 || !u_FragColor) {
             return;
         }
 
@@ -51,9 +54,11 @@ class WebGLDemo {
             //webgl坐标系下坐标
             const glX = (canvasX - centerX) / centerX;
             const glY = -(canvasY - centerY) / centerY;
-            //随机点的大小
-            const size = Math.random() * 40;
-            const point = {x: glX, y: glY, z: 0.0, size};
+            //随机点的大小 10~40
+            const size = Math.random() * 30 + 10;
+            //随机颜色(GRBA)
+            const color = [Math.random(), Math.random(), Math.random(), Math.random() * 0.5 + 0.5];
+            const point = {x: glX, y: glY, z: 0.0, size, color};
             pArrs.push(point);
             
             //设置清除颜色
@@ -63,6 +68,8 @@ class WebGLDemo {
             pArrs.forEach(p => {
                 gl.vertexAttrib3f(a_Position, p.x, p.y, p.z);
                 gl.vertexAttrib1f(a_Point, p.size);
+                const c = p.color;
+                gl.uniform4f(u_FragColor, c[0], c[1], c[2], c[3]);
                 gl.drawArrays(gl.POINTS, 0, 1);
             });
         }
