@@ -12,67 +12,55 @@ class WebGLDemo {
         }
 
         //前缀 a_ 表示变量类型 attribute
-        const posKey = 'a_Position';
-        const pointKey = 'a_Point';
+        const pos_Key = 'a_Position';
+        const point_Key = 'a_Point';
         //顶点着色器
         const vshader = `
-            attribute vec4 ${posKey};
-            attribute float ${pointKey};
+            attribute vec4 ${pos_Key};
+            attribute float ${point_Key};
             void main() {
-                gl_Position = ${posKey};
-                gl_PointSize = ${pointKey};
+                gl_Position = ${pos_Key};
+                gl_PointSize = ${point_Key};
             }
         `;
         //片元着色器
-        const colorKey = 'u_FragColor';
+        const color_Key = 'u_FragColor';
         const fshader = `
             precision mediump float;
-            uniform vec4 ${colorKey};
+            uniform vec4 ${color_Key};
             void main() {
-                gl_FragColor = ${colorKey};
+                gl_FragColor = ${color_Key};
             }
         `;
         const program = Utils.i.initShader(gl, vshader, fshader);
-        const a_Position = gl.getAttribLocation(program, posKey);
-        const a_Point = gl.getAttribLocation(program, pointKey);
-        const u_FragColor = gl.getUniformLocation(program, colorKey);
+        const a_Position = gl.getAttribLocation(program, pos_Key);
+        const a_Point = gl.getAttribLocation(program, point_Key);
+        const u_FragColor = gl.getUniformLocation(program, color_Key);
 
         if (a_Position < 0 || a_Point < 0 || !u_FragColor) {
             return;
         }
 
-        //点信息数组
-        const pArrs = [];
-
-        canvas.onclick = evt => {
-            const rect = canvas.getBoundingClientRect();
-            //canvas 坐标系下坐标
-            const canvasX = (canvas.width / rect.width) * (evt.clientX - rect.left);
-            const canvasY = (canvas.height / rect.height) * (evt.clientY - rect.top);
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            //webgl坐标系下坐标
-            const glX = (canvasX - centerX) / centerX;
-            const glY = -(canvasY - centerY) / centerY;
-            //随机点的大小 10~40
-            const size = Math.random() * 30 + 10;
-            //随机颜色(GRBA)
-            const color = [Math.random(), Math.random(), Math.random(), Math.random() * 0.5 + 0.5];
-            const point = {x: glX, y: glY, z: 0.0, size, color};
-            pArrs.push(point);
-            
-            //设置清除颜色
-            gl.clearColor(1.0, 1.0, 1.0, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-
-            pArrs.forEach(p => {
-                gl.vertexAttrib3f(a_Position, p.x, p.y, p.z);
-                gl.vertexAttrib1f(a_Point, p.size);
-                const c = p.color;
-                gl.uniform4f(u_FragColor, c[0], c[1], c[2], c[3]);
-                gl.drawArrays(gl.POINTS, 0, 1);
-            });
+        //使用缓冲区对象绘制点
+        const vertex_Buffer = gl.createBuffer();
+        if (!vertex_Buffer) {
+            return;
         }
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_Buffer);
+        const bufData = new Float32Array([0.0, 0.8, -0.8, 0.0, 0.8, 0.0]);
+        gl.bufferData(gl.ARRAY_BUFFER, bufData, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, true, 0, 0);
+        gl.enableVertexAttribArray(a_Position);
+
+        //设置点的RGBA
+        gl.uniform4f(u_FragColor, Math.random(), Math.random(), Math.random(), Math.random() * 0.5 + 0.5);
+        gl.vertexAttrib1f(a_Point, 20.0);
+        
+        //设置清除颜色
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.drawArrays(gl.POINTS, 0, 3);
     }
 }
 WebGLDemo.draw();
